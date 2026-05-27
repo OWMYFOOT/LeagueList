@@ -1,0 +1,144 @@
+import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        // Setup lane lists
+        ArrayList<Champion> top = new ArrayList<>();
+        ArrayList<Champion> jungle = new ArrayList<>();
+        ArrayList<Champion> mid = new ArrayList<>();
+        ArrayList<Champion> bot = new ArrayList<>();
+        ArrayList<Champion> support = new ArrayList<>();
+        
+        // Load champions from file
+        File champlist = new File("champlist/champlist.txt");
+        if (champlist.exists()) {
+            try (Scanner fileScanner = new Scanner(champlist)) {
+                while (fileScanner.hasNextLine()) {
+                    String champ = fileScanner.nextLine();
+                    String[] champinfo = champ.split("/");
+                    if (champinfo.length >= 5) { // Validate data format
+                        ArrayList<String> champinfolist = new ArrayList<>(Arrays.asList(champinfo));
+                        Champion champion = new Champion(champinfolist);
+                        
+                        // Add to appropriate lane
+                        if (champion.getRole().equals("Top")) {
+                            top.add(champion);
+                        } else if (champion.getRole().equals("Jungle")) {
+                            jungle.add(champion);
+                        } else if (champion.getRole().equals("Mid")) {
+                            mid.add(champion);
+                        } else if (champion.getRole().equals("Bot")) {
+                            bot.add(champion);
+                        } else if (champion.getRole().equals("Support")) {
+                            support.add(champion);
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("Warning: champlist/champlist.txt not found. Starting with empty champion list.");
+        }
+        
+        // Main program loop
+        try (Scanner scan = new Scanner(System.in)) {
+            boolean running = true;
+            while (running) {
+                System.out.println("Hello! Pick an Option: ");
+                System.out.println("View Champion ---> Press A");
+                System.out.println("Add Champion ---> Press B");
+                System.out.println("Exit Program ---> Press Q");
+                
+                String input = scan.nextLine().trim();
+                
+                if (input.equalsIgnoreCase("A")) {
+                    handleViewChampion(scan, top, jungle, mid, bot, support);
+                } else if (input.equalsIgnoreCase("B")) {
+                    handleAddChampion(scan, top, jungle, mid, bot, support);
+                } else if (input.equalsIgnoreCase("Q")) {
+                    System.out.println("Goodbye!");
+                    running = false;
+                } else {
+                    System.out.println("Invalid option selected. Please try again.");
+                }
+                
+                System.out.println(); // Add blank line for better readability
+            }
+        }
+    }
+    
+    private static void handleViewChampion(Scanner scan, ArrayList<Champion> top, 
+                                         ArrayList<Champion> jungle, ArrayList<Champion> mid, 
+                                         ArrayList<Champion> bot, ArrayList<Champion> support) {
+        System.out.println("Enter Lane: ");
+        String lane = scan.nextLine().trim();
+        System.out.println("Enter Name: ");
+        String name = scan.nextLine().trim();
+        
+        // Select the appropriate list to search
+        ArrayList<Champion> selectedLane = null;
+        switch (lane) {
+            case "Top": selectedLane = top; break;
+            case "Jungle": selectedLane = jungle; break;
+            case "Mid": selectedLane = mid; break;
+            case "Bot": selectedLane = bot; break;
+            case "Support": selectedLane = support; break;
+            default: 
+                System.out.println("Invalid lane entered.");
+                return;
+        }
+        
+        // Search and display champion
+        boolean found = false;
+        for (Champion champion : selectedLane) {
+            if (champion.getName().equalsIgnoreCase(name)) {
+                System.out.println(champion.toString());
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            System.out.println("Champion not found in " + lane + " lane.");
+        }
+    }
+    
+    private static void handleAddChampion(Scanner scan, ArrayList<Champion> top, 
+                                        ArrayList<Champion> jungle, ArrayList<Champion> mid, 
+                                        ArrayList<Champion> bot, ArrayList<Champion> support) {
+        ArrayList<String> championInfo = new ArrayList<>();
+        System.out.println("Enter Champion's Name, Role, Range, Class, and Damage Type in that order: ");
+        
+        // FIXED: Changed i > 5 to i < 5
+        for (int i = 0; i < 5; i++) {
+            String info = scan.nextLine().trim();
+            championInfo.add(info);
+        }
+        
+        try {
+            Champion newChampion = new Champion(championInfo);
+            
+            // Add to appropriate lane
+            String role = newChampion.getRole();
+            if (role.equals("Top")) {
+                top.add(newChampion);
+            } else if (role.equals("Jungle")) {
+                jungle.add(newChampion);
+            } else if (role.equals("Mid")) {
+                mid.add(newChampion);
+            } else if (role.equals("Bot")) {
+                bot.add(newChampion);
+            } else if (role.equals("Support")) {
+                support.add(newChampion);
+            } else {
+                System.out.println("Invalid role: " + role);
+                return;
+            }
+            System.out.println("Champion '" + newChampion.getName() + "' added successfully!");
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Error: Invalid champion information provided. Please ensure all fields are entered.");
+        }
+    }
+}
