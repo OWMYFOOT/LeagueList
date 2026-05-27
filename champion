@@ -1,0 +1,50 @@
+import java.util.ArrayList;
+
+public class Champion
+{
+    private String name;
+    private String role;
+    private String range;
+    private String champclass;
+    private String damagetype;
+    
+    
+    public Champion(String name, String role, String range, String champclass, String damagetype)
+    {
+        this.name = name;
+        this.role = role;
+        this.range = range;
+        this.champclass = champclass;
+        this.damagetype = damagetype;
+    }
+    
+    public Champion(ArrayList<String> info)
+    {
+        this.name = info.get(0);
+        this.role = info.get(1);
+        this.range = info.get(2);
+        this.champclass = info.get(3);
+        this.damagetype = info.get(4);
+    }
+    
+    public String getRole()
+    {
+        return role;
+    }
+    public String getName()
+      {
+        return name;
+      }
+    
+    // Optional: Add toString method for better debugging
+    @Override
+    public String toString()
+    {
+        return name + ", " + role + ", " + range + ", " + champclass + ", " + damagetype ;
+    }
+}
+
+
+
+
+
